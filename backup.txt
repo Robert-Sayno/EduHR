@@ -1,0 +1,232 @@
+<?php
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+session_start(); // Start session
+
+// Include your database connection file
+include 'connection.php';
+
+// Check if the form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Get user type
+    $userType = $_POST['userType'];
+
+    // Get entered username/email and password
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    // Validate user inputs (you can add more validation as needed)
+    if (empty($username) || empty($password)) {
+        echo "Please enter both username/email and password.";
+    } else {
+        // Perform authentication based on user type
+        if ($userType == 'teacher') {
+            // Query to check if teacher exists with the provided credentials
+            $sql = "SELECT * FROM teacher_information WHERE email = '$username' AND password = '$password'";
+        } elseif ($userType == 'parent') {
+            // Query to check if parent exists with the provided credentials
+            $sql = "SELECT * FROM parent_information WHERE email = '$username' AND password = '$password'";
+        }
+
+        // Execute the query
+        $result = mysqli_query($conn, $sql);
+
+        // Check if there's a match
+        if (mysqli_num_rows($result) == 1) {
+            // Authentication successful, redirect to respective dashboard
+            $_SESSION['userType'] = $userType; // Store user type in session
+            header("Location: dashboard.php"); // Redirect to dashboard
+            exit();
+        } else {
+            // Authentication failed
+            echo "Invalid username/email or password.";
+        }
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Form | Dan Aleko</title>
+
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <style>
+    /* Your existing styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: url(bg.jpg) no-repeat;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .wrapper {
+      width: 420px;
+      background: rgba(255, 255, 255, 0.5); /* Semi-transparent background */
+      border: 2px solid rgba(255, 255, 255, .2);
+      border-radius: 12px;
+      padding: 30px 40px;
+      color: #333; /* Text color */
+      position: relative; /* Add relative positioning for welcome message */
+    }
+
+    .welcome-message {
+      position: absolute;
+      top: -50px; /* Adjust top position */
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 18px; /* Reduce font size */
+      font-weight: bold;
+      color: #fff; /* Text color */
+      background-color: #3498db; /* Background color */
+      padding: 8px 16px; /* Reduce padding */
+      border-radius: 30px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-type-selector {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      color: #333; /* Text color */
+    }
+
+    .user-type-selector label {
+      margin: 0 10px;
+      cursor: pointer;
+    }
+
+    .user-type-selector input {
+      margin-right: 5px;
+    }
+
+    .input-box {
+      position: relative;
+      width: 100%;
+      margin: 15px 0; /* Adjust margin for better spacing */
+    }
+
+    .input-box input {
+      width: 100%;
+      height: 45px;
+      background: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+      border: none;
+      outline: none;
+      border-radius: 40px;
+      font-size: 16px;
+      color: #333;
+      padding: 0 20px;
+    }
+
+    .input-box input::placeholder {
+      color: #666; /* Placeholder text color */
+    }
+
+    .input-box i {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px;
+    }
+
+    .remember-forgot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center; /* Align vertically */
+      margin-top: 15px; /* Add some space */
+    }
+
+    .remember-forgot label {
+      display: flex;
+      align-items: center; /* Align vertically */
+      color: #666; /* Checkbox text color */
+    }
+
+    .remember-forgot input[type="checkbox"] {
+      margin-right: 5px;
+    }
+
+    .btn {
+      width: 100%;
+      height: 45px;
+      background-color: #3498db;
+      border: none;
+      outline: none;
+      border-radius: 40px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+      cursor: pointer;
+      font-size: 16px;
+      color: #fff;
+      font-weight: 600;
+      margin-top: 20px;
+      transition: background-color 0.3s; /* Add transition effect */
+    }
+
+    .btn:hover {
+      background-color: #2980b9; /* Change color on hover */
+    }
+
+    .register-link {
+      text-align: center;
+      margin-top: 20px; /* Adjust margin for better spacing */
+    }
+
+    .register-link p a {
+      color: #3498db;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .register-link p a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="welcome-message">Welcome, Nakisenyi P/S-ScholarView</div>
+    <div class="user-type-selector">
+      <input type="radio" name="userType" value="teacher" id="teacher" checked>
+      <label class="teacher-label" for="teacher">Teacher</label>
+  
+      <input type="radio" name="userType" value="parent" id="parent">
+      <label class="parent-label" for="parent">Parent</label>
+    </div>
+
+    <form action="" method="POST">
+      <div class="input-box">
+        <input type="text" id="username" name="username" placeholder="Username/Email" required>
+        <i class='bx bxs-user'></i>
+      </div>
+      <div class="input-box">
+        <input type="password" id="password" name="password" placeholder="Password" required>
+        <i class='bx bxs-lock-alt' ></i>
+      </div>
+      <div class="remember-forgot">
+        <label>
+          <input type="checkbox">Remember Me
+        </label>
+        <a href="#">Forgot Password</a>
+      </div>
+      <button type="submit" class="btn">Login</button>
+      <div class="register-link">
+        <p>Don't have an account? <a href="#">Register</a></p>
+      </div>
+    </form>
+  </div>
+
+</body>
+</html>

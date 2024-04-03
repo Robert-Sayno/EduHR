@@ -46,12 +46,12 @@
 
                                   <div class="btn-toolbar justify-content-between">
                                         <div class="btn-group">
-                                            <a href="employee/dashboard.php" class="btn btn-primary btn-lg">Log-in As Employee </a>
+                                            <a href="employee/login.php" class="btn btn-primary btn-lg">Log-in As Employee </a>
                                         </div>
 
                                         <div class="btn-group">
                                         
-                                            <a href="admin/dashboard.php" class="btn btn-primary btn-lg">Log-In As Admin</a>
+                                            <a href="admin/login.php" class="btn btn-primary btn-lg">Log-In As Admin</a>
                                         </div>
                                        
                                     </div>
