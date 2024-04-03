@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Admin Dashboard - Employees</title>
     <style>
         body {
             background-image: url('lost_property_bg.jpg');
@@ -122,16 +122,16 @@
     include_once('../auth/connection.php');
     include_once('../auth/auth_functions.php');
 
-    // Fetch users from the database
-    $sql_users = "SELECT * FROM student_information";
-    $result_users = mysqli_query($conn, $sql_users);
+    // Fetch employees from the database
+    $sql_employees = "SELECT * FROM employees";
+    $result_employees = mysqli_query($conn, $sql_employees);
 
     // Check if the query was successful
-    if ($result_users) {
-        $users = mysqli_fetch_all($result_users, MYSQLI_ASSOC);
+    if ($result_employees) {
+        $employees = mysqli_fetch_all($result_employees, MYSQLI_ASSOC);
     } else {
         // Handle the error, you can customize this part based on your needs
-        die('Error fetching users: ' . mysqli_error($conn));
+        die('Error fetching employees: ' . mysqli_error($conn));
     }
 
     // Close the database connection
@@ -140,64 +140,51 @@
 
     <div class="dashboard-container">
         <div class="dashboard-header">
-            <h2>Welcome to the Admin Dashboard</h2>
+            <h2>Welcome to the Admin Dashboard - Employees</h2>
         </div>
 
         <!-- Navigation Links -->
         <div class="nav-container">
-            <a class="nav-link" href="teacher_dashboard.php">Home Dashboard</a>
-            <a class="nav-link" href="add_student.php">add more students</a>
-            <a class="nav-link" href="view_students.php">Manage Students</a>
-            <a class="nav-link" href="logout.php">Log out</a>
-            <!-- Add more links as needed -->
+            <a class="nav-link" href="employee_dashboard.php">Home Dashboard</a>
+            <!-- Add more navigation links as needed -->
         </div>
 
-        <!-- Search and filter options -->
+        <!-- Search Input -->
         <div class="search-filter-container">
-            <input type="text" class="search-input" id="search" placeholder="Search by name">
-            <select id="filter" class="search-input">
-                <option value="">Filter by class</option>
-                <option value="P7">P7</option>
-                <option value="P6">P6</option>
-                <option value="P2">P5</option>
-                <option value="P7">P4</option>
-                <option value="P6">p3</option>
-                <option value="P2">P2</option>
-                <option value="P2">P1</option>
-
-                <!-- Add more classes as needed -->
-            </select>
+            <input type="text" id="searchInput" class="search-input" placeholder="Search...">
         </div>
 
-        <!-- Display users in a table -->
+        <!-- Display employees in a table -->
         <div class="dashboard-section">
-            <h3>All students</h3>
-            <table>
+            <h3>All Employees</h3>
+            <table id="employeeTable">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>User ID</th>
                         <th>Name</th>
-                        <th>Username</th>
-                        <th>Class</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th>Gender</th>
+                        <th>Position</th>
+                        <th>Date of Birth</th>
+                        <th>Salary</th>
+                        <th>Actions</th> <!-- New column for actions -->
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($users as $user) : ?>
+                    <?php foreach ($employees as $employee) : ?>
                         <tr>
-                            <td><?php echo $user['id']; ?></td>
-                            <td><?php echo $user['user_id']; ?></td>
-                            <td><?php echo $user['students_name']; ?></td>
-                            <td><?php echo $user['username_email']; ?></td>
-                            <td><?php echo $user['class']; ?></td>
-                            <td><?php echo (isset($user['active']) ? ($user['active'] ? 'Active' : 'Inactive') : 'N/A'); ?></td>
+                            <td><?php echo $employee['id']; ?></td>
+                            <td><?php echo $employee['user_id']; ?></td>
+                            <td><?php echo $employee['fullname']; ?></td>
+                            <td><?php echo $employee['gender']; ?></td>
+                            <td><?php echo $employee['position']; ?></td>
+                            <td><?php echo $employee['dob']; ?></td>
+                            <td><?php echo $employee['salary']; ?></td>
                             <td>
-                                <a href="edit_user.php?id=<?php echo $user['id']; ?>">Edit</a>
-                                <a href="delete_user.php?id=<?php echo $user['id']; ?>">Delete</a>
-                                <a href="manage_student.php?id=<?php echo $user['id']; ?>">manage</a>
-                            </td>
+                                <a href="edit_employee.php?id=<?php echo $employee['id']; ?>">Edit</a>
+                                <a href="delete_employee.php?id=<?php echo $employee['id']; ?>">Delete</a>
+                                <a href="manage_employee.php?id=<?php echo $employee['id']; ?>">Manage</a>
+                            </td> <!-- Action buttons -->
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -206,31 +193,31 @@
     </div>
 
     <script>
-        // JavaScript for search and filter
-        document.getElementById('search').addEventListener('input', function () {
-            filterTable();
-        });
+        // Search Filter Function
+        function searchFilter() {
+            // Declare variables
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("searchInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("employeeTable");
+            tr = table.getElementsByTagName("tr");
 
-        document.getElementById('filter').addEventListener('change', function () {
-            filterTable();
-        });
-
-        function filterTable() {
-            var searchInput = document.getElementById('search').value.toLowerCase();
-            var filterClass = document.getElementById('filter').value.toLowerCase();
-
-            var table = document.querySelector('table');
-            var rows = table.getElementsByTagName('tr');
-
-            for (var i = 1; i < rows.length; i++) {
-                var row = rows[i];
-                var nameColumn = row.getElementsByTagName('td')[2].textContent.toLowerCase();
-                var classColumn = row.getElementsByTagName('td')[4].textContent.toLowerCase();
-
-                var hideRow = (searchInput && !nameColumn.includes(searchInput)) || (filterClass && filterClass !== classColumn);
-                row.style.display = hideRow ? 'none' : '';
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[2]; // Change index to match the column you want to search (here it's the Name column)
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
             }
         }
+
+        // Attach event listener to search input
+        document.getElementById("searchInput").addEventListener("keyup", searchFilter);
     </script>
 </body>
 

@@ -1,0 +1,73 @@
+<?php
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Include the database connection file
+require_once "connection.php";
+
+// Check if the form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Get form data
+    $fullname = $_POST["fullname"];
+    $gender = $_POST["gender"];
+    $position = $_POST["position"];
+    $dob = $_POST["dob"];
+    $salary = $_POST["salary"];
+    
+    // Generate a unique user ID
+    function generateUserID()
+    {
+        // You can implement your own logic to generate a unique user ID
+        // For simplicity, a random 6-character string is generated here
+        return substr(md5(uniqid()), 0, 6);
+    }
+
+    // Generate a company username email based on the full name
+    function generateEmail($fullname)
+    {
+        // Replace spaces with underscores and convert to lowercase
+        $username = strtolower(str_replace(' ', '', $fullname));
+
+        // Dummy email domain for example purposes
+        $domain = 'eduhr.com';
+
+        return $username . '@' . $domain;
+    }
+
+    // Generate user ID and email
+    $user_id = generateUserID();
+    $email = generateEmail($fullname);
+    // Password can be generated randomly or left blank if not required for login
+
+    // Handle image upload
+    $targetDirectory = "uploads/";
+    $targetFile = $targetDirectory . basename($_FILES["photo"]["name"]);
+
+    if (move_uploaded_file($_FILES["photo"]["tmp_name"], $targetFile)) {
+        // Image uploaded successfully, insert employee details into the database
+        $photo = $targetFile;
+
+        // Prepare and execute SQL query
+        $stmt = $conn->prepare("INSERT INTO employees (user_id, fullname, gender, position, dob, salary, email, photo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssssss", $user_id, $fullname, $gender, $position, $dob, $salary, $email, $photo);
+        if ($stmt->execute()) {
+            // Redirect to success page or display success message
+            header("Location: teacher_dashboard.php");
+            exit();
+        } else {
+            // Redirect to error page or display error message
+            header("Location: add_employee.php");
+            exit();
+        }
+    } else {
+        // Redirect to error page or display error message
+        header("Location: add_employee.php");
+        exit();
+    }
+
+    // Close the statement and database connection
+    $stmt->close();
+    $conn->close();
+} 
+?>
