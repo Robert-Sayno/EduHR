@@ -1,3 +1,41 @@
+<?php
+session_start();
+
+// Check if user is not logged in
+if (!isset($_SESSION["email"])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Database connection
+require_once "../connection.php";
+
+// Retrieve admin details based on email from session
+$email = $_SESSION["email"];
+$sql_query = "SELECT fullname FROM admins WHERE email='$email'";
+$result = mysqli_query($conn, $sql_query);
+
+if (mysqli_num_rows($result) > 0) {
+    $row = mysqli_fetch_assoc($result);
+    $admin_name = $row["fullname"];
+} else {
+    // Handle error if admin details not found
+    $admin_name = "Unknown";
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <!-- Your CSS styles -->
+</head>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -98,7 +136,9 @@
 
 <body>
     <div class="header">
-        <h1>Admin Dashboard</h1>
+    <div class="header">
+        <h1>Welcome, <?php echo $admin_name; ?>!</h1>
+    </div>
     </div>
 
     <div class="nav-header">
@@ -107,6 +147,8 @@
             <a href="#">Admins</a>
             <a href="#">Employees</a>
             <a href="#">Leave Management</a>
+
+    
             <!-- Add more links as needed -->
         </div>
     </div>
