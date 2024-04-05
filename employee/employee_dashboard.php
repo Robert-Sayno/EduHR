@@ -5,7 +5,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Include the file with database connection
-include_once "connection.php";
+include_once "../connection.php";
 
 // Check if user is not logged in
 if (!isset($_SESSION["email_employee"])) {
@@ -130,7 +130,8 @@ if (!isset($_SESSION["fullname"])) {
         <div class="nav-links">
             <a href="#">Home</a>
             <a href="#">Profile</a>
-            <a href="#">Leave Requests</a>
+             <a href="leave_status.php">Check leave status</a>
+            <a href="apply_leave.php">Request Leave</a>
             <a href="#">Tasks</a>
             <p>Welcome, <?php echo $employee_fullname; ?>!</p>
             <form method="post">

@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             session_start();
             session_unset();
             $_SESSION["email_employee"] = $row["email"];
-            header("Location: ../employee_dashboard.php?login-success");
+            header("Location: employee_dashboard.php?login-success");
         } else {
             $login_Err = "<div class='alert alert-warning alert-dismissible fade show'>
                             <strong>Invalid Email/Password</strong>
