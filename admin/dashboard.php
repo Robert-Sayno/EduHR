@@ -146,7 +146,7 @@ if (mysqli_num_rows($result) > 0) {
             <a href="#">Home</a>
             <a href="#">Admins</a>
             <a href="#">Employees</a>
-            <a href="#">Leave Management</a>
+            <a href="tasks.php">Assign tasks</a>
 
     
             <!-- Add more links as needed -->

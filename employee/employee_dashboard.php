@@ -129,7 +129,7 @@ if (!isset($_SESSION["fullname"])) {
         <h1>Employee Dashboard</h1>
         <div class="nav-links">
             <a href="#">Home</a>
-            <a href="#">Profile</a>
+            <a href="view_tasks.php">View tasks</a>
              <a href="leave_status.php">Check leave status</a>
             <a href="apply_leave.php">Request Leave</a>
             <a href="#">Tasks</a>
