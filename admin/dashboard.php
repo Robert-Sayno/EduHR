@@ -154,23 +154,60 @@ if (mysqli_num_rows($result) > 0) {
     </div>
 
     <div class="container">
-        <div class="section">
-            <div class="card">
-                <div class="card-content">
-                    <p>Total Admins: 10</p>
-                    <a href="manage-admin.php">View All Admins</a>
-                </div>
-            </div>
+    <div class="section">
+    <div class="card">
+        <div class="card-content">
+            <p>Total Admins: 
+            <?php
+            // Establish connection to the database
+            require_once "../connection.php";
+
+            // SQL query to count the number of admins
+            $sql = "SELECT COUNT(*) AS total_admins FROM admins";
+            $result = $conn->query($sql);
+
+            if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                echo $row["total_admins"];
+            } else {
+                echo "0";
+            }
+
+            // Close database connection
+            $conn->close();
+            ?>
+            </p>
+            <a href="manage-admin.php">View All Admins</a>
         </div>
+    </div>
+</div>
+
 
         <div class="section">
-            <div class="card">
-                <div class="card-content">
-                    <p>Total Employees: 50</p>
-                    <a href="manage-employee.php">View All Employees</a>
-                </div>
-            </div>
+    <div class="card">
+        <div class="card-content">
+            <?php
+            include_once "connection.php";
+
+       
+            // SQL query to count the number of employees
+            $sql = "SELECT COUNT(*) AS total_employees FROM employees";
+            $result = $conn->query($sql);
+
+            if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                $total_employees = $row["total_employees"];
+                echo "<p>Total Employees: $total_employees</p>";
+            } else {
+                echo "No employees found.";
+            }
+
+            $conn->close();
+            ?>
+            <a href="view_employees.php">View All Employees</a>
         </div>
+    </div>
+</div>
 
         <div class="section">
             <div class="card">
@@ -181,45 +218,48 @@ if (mysqli_num_rows($result) > 0) {
                 </div>
             </div>
         </div>
+<div class="section">
+    <div class="card">
+        <div class="card-content">
+            <p>Employee Leadership Board</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>S.No.</th>
+                        <th>Employee's Id</th>
+                        <th>Employee's Name</th>
+                        <th>Employee's Email</th>
+                        <th>Salary in Rs.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    // Fetch employees sorted by salary in descending order
+                    $sql = "SELECT * FROM employees ORDER BY salary DESC";
+                    $result = mysqli_query($conn, $sql);
 
-        <div class="section">
-            <div class="card">
-                <div class="card-content">
-                    <p>Employee Leadership Board</p>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>S.No.</th>
-                                <th>Employee's Id</th>
-                                <th>Employee's Name</th>
-                                <th>Employee's Email</th>
-                                <th>Salary in Rs.</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>1001</td>
-                                <td>John Doe</td>
-                                <td>john@example.com</td>
-                                <td>50000</td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>1002</td>
-                                <td>Jane Smith</td>
-                                <td>jane@example.com</td>
-                                <td>48000</td>
-                            </tr>
-                            <!-- Add more rows as needed -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                    if ($result && mysqli_num_rows($result) > 0) {
+                        $serial_number = 1;
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            echo "<tr>";
+                            echo "<td>" . $serial_number++ . "</td>";
+                            echo "<td>" . $row['id'] . "</td>";
+                            echo "<td>" . $row['fullname'] . "</td>";
+                            echo "<td>" . $row['email'] . "</td>";
+                            echo "<td>" . $row['salary'] . "</td>";
+                            echo "</tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='5'>No employees found</td></tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
         </div>
-
-        <!-- Add more sections as needed -->
     </div>
+</div>
+
+
 </body>
 
 </html>
