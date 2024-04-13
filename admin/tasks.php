@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Assignment</title>
+    <title>Assign Task</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -84,81 +84,83 @@
     </style>
 </head>
 <body>
-    <header class="header">
-        <h1>Task Assignment</h1>
-    </header>
+    <div class="header">
+        <h1>Assign Task</h1>
+    </div>
     <nav class="nav-header">
         <div class="nav-links">
             <a href="#">Home</a>
             <a href="#">Employees</a>
             <a href="#">Tasks</a>
-            <!-- Add more navigation links as needed -->
         </div>
     </nav>
-    <div class="container">
-        <main>
-            <h2>Assign Task</h2>
-            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-    <label for="employee">Select Employee:</label>
-    <select name="employee" id="employee">
-        <?php
-        // Assuming $conn is your database connection
-        include_once "connection.php";
+    <?php
+    // Enable error reporting
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
 
-        // Fetch employees from the database
-        $sql = "SELECT user_id, fullname FROM employees";
-        $result = $conn->query($sql);
+    // Include the database connection file
+    require_once "connection.php";
 
-        // Check if any rows are returned
-        if ($result->num_rows > 0) {
-            // Output data of each row as options in the select element
-            while ($row = $result->fetch_assoc()) {
-                echo "<option value='" . $row["user_id"] . "'>" . $row["fullname"] . "</option>";
-            }
+    // Define variables to store form data
+    $employee_name = $task_description = "";
+
+    // Check if the form is submitted
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        // Get form data
+        $employee_name = $_POST["employee"]; // Assuming the employee name is sent from the form
+        $task_description = $_POST["task"]; // Assuming the task description is sent from the form
+
+        // Prepare and execute SQL query
+        $stmt = $conn->prepare("INSERT INTO tasks (description, fullname) VALUES (?, ?)");
+        $stmt->bind_param("ss", $task_description, $employee_name);
+        if ($stmt->execute()) {
+            // Display JavaScript alert
+            echo '<script>alert("Task assigned successfully!");</script>';
+            // Delay the redirection by 1 second to ensure the alert is shown
+            echo '<script>setTimeout(function(){ window.location.href = "dashboard.php?success=true"; }, 1000);</script>';
+            // Exit the script
+            exit();
         } else {
-            echo "<option value=''>No employees available</option>";
+            // Redirect to error page
+            header("Location: tasks.php?success=false");
+            exit();
         }
-        ?>
-    </select>
-    <br>
-    <label for="task">Task Description:</label><br>
-    <textarea name="task" id="task" rows="4" cols="50"></textarea>
-    <br>
-    <input type="submit" value="Assign Task">
-</form>
+        
 
-<?php
-// Check if the form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Include database connection
-    include_once "connection.php";
-
-    // Get data from the form
-    $employee_id = $_POST['employee']; // Use the employee's user_id directly
-    $task_description = $_POST['task'];
-
-    // Insert the task into the database
-    $sql_insert_task = "INSERT INTO tasks (user_id, task_description) VALUES (?, ?)";
-    $stmt_insert_task = $conn->prepare($sql_insert_task);
-    $stmt_insert_task->bind_param("is", $employee_id, $task_description);
-
-    if ($stmt_insert_task->execute()) {
-        echo "<p>Task assigned successfully.</p>";
-    } else {
-        echo "<p>Error: " . $sql_insert_task . "<br>" . $conn->error . "</p>";
+        // Close the statement and database connection
+        $stmt->close();
+        $conn->close();
     }
+    ?>
+    
+    <div class="container">
+        <h2>Assign Task</h2>
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <label for="employee">Select Employee:</label>
+            <select name="employee" id="employee">
+                <?php
+                // Fetch employees from the database
+                $sql = "SELECT fullname FROM employees";
+                $result = $conn->query($sql);
 
-    // Close statement and database connection
-    $stmt_insert_task->close();
-    $conn->close();
-}
-?>
-
-
-        </main>
+                // Check if any rows are returned
+                if ($result->num_rows > 0) {
+                    // Output data of each row as options in the select element
+                    while ($row = $result->fetch_assoc()) {
+                        echo "<option value='" . $row["fullname"] . "'>" . $row["fullname"] . "</option>";
+                    }
+                } else {
+                    echo "<option value=''>No employees available</option>";
+                }
+                ?>
+            </select>
+            <br>
+            <label for="task">Task Description:</label><br>
+            <textarea name="task" id="task" rows="4" cols="50"><?php echo $task_description; ?></textarea>
+            <br>
+            <input type="submit" value="Assign Task">
+        </form>
     </div>
-    <footer>
-        <!-- Footer content -->
-    </footer>
 </body>
 </html>

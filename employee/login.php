@@ -11,7 +11,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $email = $_REQUEST["email"];
     }
-
     if (empty($_REQUEST["password"])) {
         $pass_err = "<p style='color:red'> * Password Can Not Be Empty</p>";
     } else {

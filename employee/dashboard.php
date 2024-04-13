@@ -6,11 +6,9 @@ require_once "include/header.php";
         // database connection
         require_once "../connection.php";
 
-         
+      
         $i = 1;
         
-
-
         // applied leaves--------------------------------------------------------------------------------------------
         $total_accepted = $total_pending = $total_canceled = $total_applied = 0;
         $leave = "SELECT * FROM emp_leave WHERE email = '$_SESSION[email_emp]' ";
@@ -34,8 +32,6 @@ require_once "include/header.php";
         }else{
             $total_accepted = $total_pending = $total_canceled = $total_applied = 0;
         }
-
-
 
         // leave status--------------------------------------------------------------------------------------------------------------
         $currentDay = date( 'Y-m-d', strtotime("today") );
